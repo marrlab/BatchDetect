@@ -184,7 +184,7 @@ class BatchDetect():
         fig, ax = plt.subplots(figsize=(len(self.metadata.columns), 2))
 
         ax = sns.boxplot(data=results,
-                         x="feature",
+                         x="covariate",
                          y=scorer,
                          hue="method",
                          ax=ax)
