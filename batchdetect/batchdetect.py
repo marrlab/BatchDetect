@@ -102,27 +102,27 @@ class BatchDetect():
 
         heatmap_mat = pd.DataFrame(0.,
                                    columns=self.metadata.columns,
-                                   index = ["PC" + str(i) for i in range(n_components)])
+                                   index=["PC" + str(i) for i in range(n_components)])
 
         for i in range(nrows):
             for j in range(ncols):
-                heatmap_mat.iloc[i,j] = f_classif(X_emb.iloc[:,i:i+1],
-                                             self.metadata.iloc[:,j])[1][0]
+                heatmap_mat.iloc[i, j] = f_classif(X_emb.iloc[:, i:i+1],
+                                                   self.metadata.iloc[:, j])[1][0]
 
-        fig, ax = plt.subplots(figsize = (1*ncols, 1*nrows))
+        fig, ax = plt.subplots(figsize=(1*ncols, 1*nrows))
 
         ax = sns.heatmap(heatmap_mat,
-                         cmap = "Greys_r",
+                         cmap="Greys_r",
                          annot=True,
                          fmt=".3f",
-                         ax = ax,
-                         vmin = 0,
-                         vmax = 0.05)
+                         ax=ax,
+                         vmin=0,
+                         vmax=0.05)
 
     def classification_test(self,
                             scorer="accuracy",
-                            n_splits = 5,
-                            n_repeats = 10):
+                            n_splits=5,
+                            n_repeats=10):
         """
         classification test runs two classifiers. One is a DummyClassifier from
         sklearn with uniform strategy and the next one is a
@@ -148,17 +148,17 @@ class BatchDetect():
         for col in self.metadata.columns:
 
             random_results = cross_val_score(
-                estimator = DummyClassifier(strategy = "uniform"),
-                    X = self.features,
-                    y = self.metadata.loc[:,col],
-                    cv = RepeatedStratifiedKFold(n_splits=n_splits,
+                estimator=DummyClassifier(strategy="uniform"),
+                    X=self.features,
+                    y=self.metadata.loc[:,col],
+                    cv=RepeatedStratifiedKFold(n_splits=n_splits,
                                                  n_repeats=n_repeats),
                     scoring=scorer
             )
 
-            results["covariate"] +=[col]*n_splits*n_repeats
-            results["method"] +=["random"]*n_splits*n_repeats
-            results[scorer] +=random_results.tolist()
+            results["covariate"] += [col]*n_splits*n_repeats
+            results["method"] += ["random"]*n_splits*n_repeats
+            results[scorer] += random_results.tolist()
 
             rf_results = cross_val_score(
                 estimator = RandomForestClassifier(),
@@ -169,9 +169,9 @@ class BatchDetect():
                     scoring=scorer
             )
 
-            results["covariate"] +=[col]*n_splits*n_repeats
-            results["method"] +=["random forest"]*n_splits*n_repeats
-            results[scorer] +=rf_results.tolist()
+            results["covariate"] += [col]*n_splits*n_repeats
+            results["method"] += ["random forest"]*n_splits*n_repeats
+            results[scorer] += rf_results.tolist()
 
         results = pd.DataFrame(results)
 
