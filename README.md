@@ -28,10 +28,10 @@ bd = BatchDetect(metadata, features)
 
 After that you can run different methods as you would like. These methods include:
 
-- `bd.low_dim_visualization("pca")`
-- `bd.low_dim_visualization("tsne")`
-- `bd.low_dim_visualization("umap")`
-- `bd.classification_test()`
+-   `bd.low_dim_visualization("pca")`
+-   `bd.low_dim_visualization("tsne")`
+-   `bd.low_dim_visualization("umap")`
+-   `bd.classification_test()`
 
 For more examples or more information about the possible options,
 please refere to our [docs](docs) folder.
