@@ -14,25 +14,30 @@ from sklearn.model_selection import RepeatedStratifiedKFold
 from umap import UMAP
 
 
-def pca_emb(features,n_components=2):
+def pca_emb(features, n_components=2):
     X_emb = StandardScaler().fit_transform(features)
     X_emb = PCA(n_components=n_components).fit_transform(X_emb)
     return numpy_to_dataframe(X_emb)
 
-def tsne_emb(features,n_components=2):
+
+def tsne_emb(features, n_components=2):
     X_emb = StandardScaler().fit_transform(features)
     X_emb = TSNE(n_components).fit_transform(X_emb)
     return numpy_to_dataframe(X_emb)
 
-def umap_emb(features,n_components=2):
+
+def umap_emb(features, n_components=2):
     X_emb = StandardScaler().fit_transform(features)
     X_emb = UMAP(n_components=n_components).fit_transform(X_emb)
     return numpy_to_dataframe(X_emb)
 
+
 def numpy_to_dataframe(X_emb):
     n_col = X_emb.shape[1]
-    X_emb = pd.DataFrame(X_emb, columns=["PC" + str(i+1) for i in range(n_col)])
+    X_emb = pd.DataFrame(X_emb,
+                         columns=["PC" + str(i+1) for i in range(n_col)])
     return X_emb
+
 
 class BatchDetect():
     """
@@ -55,7 +60,7 @@ class BatchDetect():
         self.metadata = metadata
         self.features = features
 
-    def low_dim_visualization(self, method = "pca"):
+    def low_dim_visualization(self, method="pca"):
         """
         low dimensional visualization creates a 2D representation of the
         provided features and generates scatterplots based on the covariates
@@ -75,17 +80,17 @@ class BatchDetect():
         ncols = self.metadata.shape[1]
         nrows = 1
 
-        fig, ax = plt.subplots(nrows = nrows ,
-                               ncols = ncols,
-                               figsize = (5*ncols, 5*nrows),
+        fig, ax = plt.subplots(nrows=nrows,
+                               ncols=ncols,
+                               figsize=(5*ncols, 5*nrows),
                                sharex=True, sharey=True)
         for j in range(ncols):
-            ax[j] = sns.scatterplot(x = X_emb.iloc[:,0],
-                                    y = X_emb.iloc[:,1],
-                                    hue = self.metadata.iloc[:,j],
-                                   ax = ax[j])
+            ax[j] = sns.scatterplot(x=X_emb.iloc[:, 0],
+                                    y=X_emb.iloc[:, 1],
+                                    hue=self.metadata.iloc[:, j],
+                                    ax=ax[j])
 
-    def prince_plot(self,n_components=5):
+    def prince_plot(self, n_components=5):
         """
         prince plot first generates a PCA embedding of the features. then
         it runs an ANOVA test of every principal componenet (PC) vs. the
@@ -100,14 +105,16 @@ class BatchDetect():
         ncols = self.metadata.shape[1]
         nrows = n_components
 
+        column_names = ["PC" + str(i) for i in range(n_components)]
         heatmap_mat = pd.DataFrame(0.,
                                    columns=self.metadata.columns,
-                                   index=["PC" + str(i) for i in range(n_components)])
+                                   index=column_names)
 
         for i in range(nrows):
             for j in range(ncols):
-                heatmap_mat.iloc[i, j] = f_classif(X_emb.iloc[:, i:i+1],
-                                                   self.metadata.iloc[:, j])[1][0]
+                p_value = f_classif(X_emb.iloc[:, i:i+1],
+                                    self.metadata.iloc[:, j])[1][0]
+                heatmap_mat.iloc[i, j] = p_value
 
         fig, ax = plt.subplots(figsize=(1*ncols, 1*nrows))
 
@@ -126,7 +133,7 @@ class BatchDetect():
         """
         classification test runs two classifiers. One is a DummyClassifier from
         sklearn with uniform strategy and the next one is a
-        RandomForestClassifier. The target variables are based on the covariates
+        RandomForestClassifier. The target variables are based on the covariate
         in the metadata dataframe. If the Randomforst works better than the
         DummyClassifier, it means that there is a systematic batch effect for
         that specific covariate.
@@ -174,12 +181,11 @@ class BatchDetect():
 
         results = pd.DataFrame(results)
 
-
-        fig, ax = plt.subplots(figsize = (len(self.metadata.columns), 2))
+        fig, ax = plt.subplots(figsize=(len(self.metadata.columns), 2))
 
         ax = sns.boxplot(data=results,
                          x="feature",
-                        y=scorer,
-                        hue="method",
-                        ax=ax)
+                         y=scorer,
+                         hue="method",
+                         ax=ax)
         ax.legend(loc=(1.04, 0))
