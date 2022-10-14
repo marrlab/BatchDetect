@@ -165,7 +165,7 @@ class BatchDetect():
                                              y=self.metadata.loc[:, col],
                                              cv=rskf,
                                              scoring=scorer,
-                                             verbose=3)
+                                             verbose=1)
 
             results["covariate"] += [col]*n_splits*n_repeats
             results["method"] += ["random"]*n_splits*n_repeats
@@ -177,7 +177,7 @@ class BatchDetect():
                                          y=self.metadata.loc[:, col],
                                          cv=rskf,
                                          scoring=scorer,
-                                         verbose=3)
+                                         verbose=1)
 
             results["covariate"] += [col]*n_splits*n_repeats
             results["method"] += ["random forest"]*n_splits*n_repeats
