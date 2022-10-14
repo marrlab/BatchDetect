@@ -145,29 +145,28 @@ class BatchDetect():
         results[scorer] = []
         results["method"] = []
 
+        rskf = RepeatedStratifiedKFold(n_splits=n_splits,
+                                       n_repeats=n_repeats)
+
         for col in self.metadata.columns:
 
-            random_results = cross_val_score(
-                estimator=DummyClassifier(strategy="uniform"),
-                    X=self.features,
-                    y=self.metadata.loc[:,col],
-                    cv=RepeatedStratifiedKFold(n_splits=n_splits,
-                                                 n_repeats=n_repeats),
-                    scoring=scorer
-            )
+            dc = DummyClassifier(strategy="uniform")
+            random_results = cross_val_score(estimator=dc,
+                                             X=self.features,
+                                             y=self.metadata.loc[:, col],
+                                             cv=rskf,
+                                             scoring=scorer)
 
             results["covariate"] += [col]*n_splits*n_repeats
             results["method"] += ["random"]*n_splits*n_repeats
             results[scorer] += random_results.tolist()
 
-            rf_results = cross_val_score(
-                estimator = RandomForestClassifier(),
-                    X = self.features,
-                    y = self.metadata.loc[:,col],
-                    cv = RepeatedStratifiedKFold(n_splits=n_splits,
-                                                n_repeats=n_repeats),
-                    scoring=scorer
-            )
+            rf = RandomForestClassifier()
+            rf_results = cross_val_score(estimator=rf,
+                                         X=self.features,
+                                         y=self.metadata.loc[:, col],
+                                         cv=rskf,
+                                         scoring=scorer)
 
             results["covariate"] += [col]*n_splits*n_repeats
             results["method"] += ["random forest"]*n_splits*n_repeats
@@ -178,9 +177,9 @@ class BatchDetect():
 
         fig, ax = plt.subplots(figsize = (len(self.metadata.columns), 2))
 
-        ax = sns.boxplot(data = results,
-                         x = "feature",
-                        y = scorer,
-                        hue = "method",
-                        ax = ax)
+        ax = sns.boxplot(data=results,
+                         x="feature",
+                        y=scorer,
+                        hue="method",
+                        ax=ax)
         ax.legend(loc=(1.04, 0))
