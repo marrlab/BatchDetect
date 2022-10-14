@@ -90,7 +90,7 @@ class BatchDetect():
                                     size=1,
                                     hue=self.metadata.iloc[:, j],
                                     ax=ax[j])
-            ax[j].legend(bbox_to_anchor=(1.04,1), loc="upper left")
+            ax[j].legend(bbox_to_anchor=(1.04, 1), loc="upper left")
 
     def prince_plot(self, n_components=5):
         """
@@ -170,7 +170,7 @@ class BatchDetect():
             results["method"] += ["random"]*n_splits*n_repeats
             results[scorer] += random_results.tolist()
 
-            rf = RandomForestClassifier()
+            rf = RandomForestClassifier(n_jobs=-1)
             rf_results = cross_val_score(estimator=rf,
                                          X=self.features,
                                          y=self.metadata.loc[:, col],
