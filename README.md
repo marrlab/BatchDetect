@@ -4,3 +4,10 @@
 
 This repository contain the code for detecting batch effects in different
 datasets.
+
+
+For different examples, you can follow our examples in the [docs](docs) folder.
+
+## How to cite this work
+
+coming soon
