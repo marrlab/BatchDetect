@@ -185,7 +185,7 @@ class BatchDetect():
 
         results = pd.DataFrame(results)
 
-        for cov in results.covariate.uinque():
+        for cov in results.covariate.unique():
             row_index_random = results["covariate"] == cov
             row_index_random = row_index_random & (results["method"]=="random")
             random_scores = results.loc[row_index_random, scorer].tolist()
