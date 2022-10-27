@@ -52,11 +52,7 @@ class FeatureExtractor(object):
 
 
 class FirstAndSecondLevelFeatures(BaseEstimator, TransformerMixin):
-
-    def __init__(self,
-                 distances=[5],
-                 angles=[0],
-                 levels=256):
+    def __init__(self, distances=[5], angles=[0], levels=256):
         self.distances = distances
         self.angles = angles
         self.levels = levels
