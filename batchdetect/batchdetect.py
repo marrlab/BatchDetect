@@ -10,7 +10,7 @@ from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import RepeatedStratifiedKFold
-
+from scipy.stats import mannwhitneyu
 from umap import UMAP
 
 
@@ -184,6 +184,17 @@ class BatchDetect():
             results[scorer] += rf_results.tolist()
 
         results = pd.DataFrame(results)
+
+        for cov in results.covariate.uinque():
+            row_index_random = results["covariate"] == cov
+            row_index_random = row_index_random & (results["method"]=="random")
+            random_scores = results.loc[row_index_random, scorer].tolist()
+
+            row_index_rf = results["covariate"] == cov
+            row_index_rf = row_index_rf & (results["method"]=="random forest")
+            rf_scores = results.loc[row_index_rf, scorer].tolist()
+
+            print("comparing", cov, mannwhitneyu)
 
         fig, ax = plt.subplots(figsize=(len(self.metadata.columns), 2))
 
