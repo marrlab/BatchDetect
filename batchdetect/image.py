@@ -72,8 +72,8 @@ class FirstAndSecondLevelFeatures(BaseEstimator, TransformerMixin):
             # First Order Features
             features["mean_intensity_Ch" + str(ch+1)] = image[:, :, ch].mean()
             features["std_intensity_Ch" + str(ch+1)] = image[:, :, ch].std()
-            features["kurtosis_intensity_Ch" + str(ch+1)] = kurtosis(image[:,:,ch])
-            features["skew_intensity_Ch" + str(ch+1)] = skew(image[:, :, ch])
+            features["kurtosis_intensity_Ch" + str(ch+1)] = kurtosis(image[:,:,ch].ravel())
+            features["skew_intensity_Ch" + str(ch+1)] = skew(image[:, :, ch].ravel())
             features["min_intensity_Ch" + str(ch+1)] = image[:, :, ch].min()
             features["max_intensity_Ch" + str(ch+1)] = image[:, :, ch].max()
             features["shannon_entropy_Ch" + str(ch+1)] = shannon_entropy(image[:,:,ch])
