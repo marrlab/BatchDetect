@@ -38,8 +38,9 @@ please refere to our [docs](docs) folder.
 
 ## Automatic feature extraction
 
-The package also considers that there no available feature set. We also provided
+The package also considers that there is no available feature set. We also provided
 an automatic feature extraction based on first and second Order image features.
+The only requirement is to provide a `metadata` dataframe with the column `file`.
 
 You can create a feature dataframe by simply using the following:
 
