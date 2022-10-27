@@ -196,7 +196,7 @@ class BatchDetect():
 
             print("comparing", cov, mannwhitneyu(random_scores, rf_scores))
 
-        fig, ax = plt.subplots(figsize=(len(self.metadata.columns), 2))
+        fig, ax = plt.subplots(figsize=(len(self.metadata.columns), 3))
 
         ax = sns.boxplot(data=results,
                          x="covariate",
