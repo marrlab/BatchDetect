@@ -88,7 +88,7 @@ class BatchDetect():
             ax[j] = sns.scatterplot(x=X_emb.iloc[:, 0],
                                     y=X_emb.iloc[:, 1],
                                     size=1,
-                                    hue=self.metadata.iloc[:, j],
+                                    hue=self.metadata.iloc[:, j].tolist(),
                                     ax=ax[j])
             ax[j].legend(bbox_to_anchor=(1.04, 1), loc="upper left")
 
