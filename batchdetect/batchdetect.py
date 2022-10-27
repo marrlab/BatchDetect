@@ -194,7 +194,7 @@ class BatchDetect():
             row_index_rf = row_index_rf & (results["method"]=="random forest")
             rf_scores = results.loc[row_index_rf, scorer].tolist()
 
-            print("comparing", cov, mannwhitneyu(random_scores, rf_scores))
+            print("comparing", cov, ":", mannwhitneyu(random_scores, rf_scores))
 
         fig, ax = plt.subplots(figsize=(len(self.metadata.columns), 3))
 
