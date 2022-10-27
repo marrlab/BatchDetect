@@ -87,7 +87,7 @@ class BatchDetect():
         for j in range(ncols):
             ax[j] = sns.scatterplot(x=X_emb.iloc[:, 0],
                                     y=X_emb.iloc[:, 1],
-                                    size=1,
+                                    s=1,
                                     hue=self.metadata.iloc[:, j].tolist(),
                                     ax=ax[j])
             ax[j].legend(bbox_to_anchor=(1.04, 1), loc="upper left")
@@ -194,7 +194,7 @@ class BatchDetect():
             row_index_rf = row_index_rf & (results["method"]=="random forest")
             rf_scores = results.loc[row_index_rf, scorer].tolist()
 
-            print("comparing", cov, mannwhitneyu)
+            print("comparing", cov, mannwhitneyu(random_scores, rf_scores))
 
         fig, ax = plt.subplots(figsize=(len(self.metadata.columns), 2))
 
