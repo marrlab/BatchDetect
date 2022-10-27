@@ -36,6 +36,21 @@ After that you can run different methods as you would like. These methods includ
 For more examples or more information about the possible options,
 please refere to our [docs](docs) folder.
 
+## Automatic feature extraction
+
+The package also considers that there no available feature set. We also provided
+an automatic feature extraction based on first and second Order image features.
+
+You can create a feature dataframe by simply using the following:
+
+```python
+from batchdetect.image import automatic_feature_extraction
+
+df_features = automatic_feature_extraction(metadata)
+```
+
+The rest would be similar to the previous part.
+
 ## How to cite this work
 
 coming soon
