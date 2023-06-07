@@ -65,3 +65,11 @@ Jensen-Shannon distance
 KL-Divergence
 Other distribution metrics (???)
 Look at scIB
+
+Silhoutte Score (Cluster plots)
+FID score (distance between original and synthetic image) in this case synthetic meaning normalized by traditional methods or augmentation
+Moran’s I (Check cluster auto-correlations i.e are the neighbors in a single cluster highly correlated or not)
+KS test for distributions of domains before & after correction
+…..
+
+Add datasets before Wednesday (21st)
