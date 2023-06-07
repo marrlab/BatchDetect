@@ -55,3 +55,13 @@ The rest would be similar to the previous part.
 ## How to cite this work
 
 coming soon
+
+## Metrics to use:
+
+Silhoutte Score (UMAP)
+Mean local diversity
+Shannon’s equitability (???)
+Jensen-Shannon distance
+KL-Divergence
+Other distribution metrics (???)
+Look at scIB
