@@ -58,16 +58,15 @@ coming soon
 
 ## Metrics to use:
 
-* Silhoutte Score (UMAP)
-* Mean local diversity
-* Shannon’s equitability (???)
-* Jensen-Shannon distance
-* KL-Divergence
-* ther distribution metrics (???)
-* Look at scIB
-* FID score
-* Moran's I
-* KS test
+* Silhoutte Score (UMAP) (Rushin)
+* Mean local diversity (Sophia)
+* Shannon’s equitability (Sophia)
+* Jensen-Shannon distance (Sophia)
+* KL-Divergence (Manuel)
+* other distribution metrics (Ali)
+* Look at scIB (Ali)
+* FID score (Manuel)
+* Moran's I (Rushin)
 …..
 
 Add datasets before Wednesday (21st)
