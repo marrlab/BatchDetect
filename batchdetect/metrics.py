@@ -3,6 +3,7 @@ from scipy.spatial.distance import cdist
 from scipy.stats import entropy
 from sklearn.datasets import make_multilabel_classification
 import pandas as pd
+from sklearn import metrics
 
 
 # template for a new metric:
@@ -64,6 +65,32 @@ def mean_local_diversity(metadata, batch_list, df_features, k=10):
         
     return mean_local_diversity
 
+
+def silhouette_score(metadata, batch_list, df_features):
+    """
+    Compute the mean Silhouette Coefficient of all samples.
+    
+    inputs:
+        metadata:   pandas dataframe with all the possible covariates
+        batch_list: a list including the covariates to be used for the
+                    batch effect correction. Thse covariates should be
+                    a column name in the metadata dataframe
+        df_features: pandas dataframe with the numerical features
+
+    outputs:
+        metrics (dict): dictionary with the calculated metrics
+    """
+    num_points = len(df_features)
+    covariate_specific_silhoutte_score = {batch_label: [] for batch_label in batch_list}
+
+    # compute the silhoutte score for each batch
+    for batch_label in batch_list:
+        covariate_specific_silhoutte_score[batch_label] = metrics.silhouette_score(df_features, batch_label)
+
+    return covariate_specific_silhoutte_score
+
+
+
 # test metrics above
 # ------------------
 # X , y = make_multilabel_classification(n_samples=1000, n_classes=5)
@@ -72,3 +99,4 @@ def mean_local_diversity(metadata, batch_list, df_features, k=10):
 # batch_list = ["col3", "col4", "col5"]
 
 # print(mean_local_diversity(metadata, batch_list, df_features, k=10))
+# print(silhouette_score(metadata, batch_list, df_features))
