@@ -23,7 +23,7 @@ import pandas as pd
 # return metrics
 
 
-def mean_local_diversity(metadata, batch_list, df_features, k=5):
+def mean_local_diversity(metadata, batch_list, df_features, k=10):
     """
     computes the Shannon diversity for each point in the dataset over its k nearest neighbors
     
