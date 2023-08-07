@@ -9,7 +9,7 @@ from sklearn.base import BaseEstimator
 from sklearn.base import TransformerMixin
 
 from scipy.stats import kurtosis, skew
-from skimage.feature import greycomatrix, greycoprops
+from skimage.feature import graycomatrix, graycoprops
 from skimage.measure import shannon_entropy
 
 
@@ -20,7 +20,7 @@ def list_of_dict_to_dict(list_of_dicts):
     return new_dict
 
 
-def automatic_feature_extraction(metadata):
+def first_and_second_order(metadata):
     feature_union = FeatureUnion([
                                 ("MaskBasedFeatures",
                                  FirstAndSecondLevelFeatures())
@@ -82,27 +82,27 @@ class FirstAndSecondLevelFeatures(BaseEstimator, TransformerMixin):
             # convert to unsigned for GLCM
             temp_image = temp_image.astype('uint8')
             # calculating glcm
-            glcm = greycomatrix(temp_image,
+            glcm = graycomatrix(temp_image,
                                 distances=self.distances,
                                 angles=self.angles,
                                 levels=self.levels)
             # storing the glcm values
-            features["contrast_Ch" + str(ch+1)] = greycoprops(
+            features["contrast_Ch" + str(ch+1)] = graycoprops(
                                                             glcm,
                                                             prop='contrast')[0, 0]
-            features["dissimilarity_Ch" + str(ch+1)] = greycoprops(
+            features["dissimilarity_Ch" + str(ch+1)] = graycoprops(
                                                             glcm,
                                                             prop='dissimilarity')[0, 0]
-            features["homogeneity_Ch" + str(ch+1)] = greycoprops(
+            features["homogeneity_Ch" + str(ch+1)] = graycoprops(
                                                             glcm,
                                                             prop='homogeneity')[0, 0]
-            features["ASM_Ch" + str(ch+1)] = greycoprops(
+            features["ASM_Ch" + str(ch+1)] = graycoprops(
                                                             glcm,
                                                             prop='ASM')[0, 0]
-            features["energy_Ch" + str(ch+1)] = greycoprops(
+            features["energy_Ch" + str(ch+1)] = graycoprops(
                                                             glcm,
                                                             prop='energy')[0, 0]
-            features["correlation_Ch" + str(ch+1)] = greycoprops(
+            features["correlation_Ch" + str(ch+1)] = graycoprops(
                                                             glcm,
                                                             prop='correlation')[0, 0]
         return features
