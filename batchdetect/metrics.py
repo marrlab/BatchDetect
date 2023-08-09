@@ -104,37 +104,35 @@ def kullback_leibler_divergence(metadata, batch_list, df_features):
     inputs:
         metadata:    pandas dataframe with all the possible covariates
         batch_list:  a list including the covariates to be used for the
-                     batch effect correction. Thse covariates should be
-                     a column name in the metadata dataframe
+                     batch effect correction. These covariates should be
+                     column names in the metadata dataframe
         df_features: pandas dataframe with the numerical features
 
     outputs:
-        metrics (dict): dictionary with the calculated metrics
+        metrics (dict): dictionary with the calculated pairwise metircs
     """
     metrics = {}
 
     for var1, var2 in itertools.combinations(batch_list, 2):
-    
-        assert var1 in metadata
-        assert var2 in metadata
 
-        data1 = df_features[var1]
-        data2 = df_features[var2]
-    
+        # extract feature subsets based on metadata batch labels
+        subset1 = df_features[metadata[var1] == 1]
+        subset2 = df_features[metadata[var2] == 1]
+
         # calculate the empirical probabilities
-        p = data1.value_counts(normalize=True)
-        q = data2.value_counts(normalize=True)
-    
+        p = subset1.value_counts(normalize=True)
+        q = subset2.value_counts(normalize=True)
+
         # make sure that p and q have the same index
         p, q = p.align(q, fill_value=0)
         p, q = p.values, q.values
-    
+
         # compute KL divergence
         mask = (p != 0) & (q != 0)
         kl_div = np.sum(p[mask] * np.log(p[mask] / q[mask]))
         metrics[(var1, var2)] = kl_div
-    
-        return metrics
+
+    return metrics
     
     
 def jensen_shannon_divergence(metadata, batch_list, df_features):
@@ -144,35 +142,33 @@ def jensen_shannon_divergence(metadata, batch_list, df_features):
     inputs:
         metadata:    pandas dataframe with all the possible covariates
         batch_list:  a list including the covariates to be used for the
-                     batch effect correction. Thse covariates should be
-                     a column name in the metadata dataframe
+                     batch effect correction. These covariates should be
+                     column names in the metadata dataframe
         df_features: pandas dataframe with the numerical features
 
-
     outputs:
-        metrics (dict): dictionary with the calculated metrics
+        metrics (dict): dictionary with the calculated pairwise metrics
     """
     metrics = {}
 
     for var1, var2 in itertools.combinations(batch_list, 2):
-        assert var1 in metadata
-        assert var2 in metadata
-        
-        data1 = df_features[var1]
-        data2 = df_features[var2]
-        
+
+        # extract feature subsets based on metadata batch labels
+        subset1 = df_features[metadata[var1] == 1]
+        subset2 = df_features[metadata[var2] == 1]
+
         # calculate the empirical probabilities
-        p = data1.value_counts(normalize=True)
-        q = data2.value_counts(normalize=True)
+        p = subset1.value_counts(normalize=True)
+        q = subset2.value_counts(normalize=True)
 
         # make sure that p and q have the same index
         p, q = p.align(q, fill_value=0)
         p, q = p.values, q.values
 
-        # caluclate m distribution
+        # calculate m distribution
         m = (p + q) / 2
 
-        # compute js divergence
+        # compute JS divergence
         mask = (p != 0) & (q != 0) & (m != 0)
         
         kl_pm = np.sum(p[mask] * np.log(p[mask] / m[mask]))
@@ -187,50 +183,50 @@ def jensen_shannon_divergence(metadata, batch_list, df_features):
 def frechet_inception_distance(metadata, batch_list, df_features):
     """
     calculates the pairwise fid between all given covariates
-    
 
     inputs:
         metadata:    pandas dataframe with all the possible covariates
-        batch_list:  a list including the covariates to be used for the
-                     batch effect correction. Thse covariates should be
-                     a column name in the metadata dataframe
+        batch_list:  a list of covariates to be used for the
+                     batch effect correction. These covariates should be
+                     column names in the metadata dataframe
         df_features: pandas dataframe with the numerical features
+
     outputs:
-        metrics (dict): dictionary with the calculated metrics
+        pairwise_fid (dict): dictionary with the calculated pairwise metrics
     """
-    metrics = {}
-    
+
+    pairwise_fid = {}
+
     for var1, var2 in itertools.combinations(batch_list, 2):
 
-        # assert that the covariate names are valid
-        assert var1 in metadata
-        assert var2 in metadata
+        # extract feature subsets based on metadata batch labels
+        subset1 = df_features[metadata[var1] == 1]
+        subset2 = df_features[metadata[var2] == 1]
+
+        # calculate mean and covariance statistics for subset1
+        mu1, sigma1 = subset1.mean(axis=0), np.cov(subset1, rowvar=False)
         
-        # get the output activations from inception
-        act1 = df_features[var1].iloc[0]
-        act2 = df_features[var2].iloc[0]
-        
-        # calculate mean and covariance statistics
-        mu1, sigma1 = act1.mean(axis=0), np.cov(act1, rowvar=False)
-        mu2, sigma2 = act2.mean(axis=0), np.cov(act2, rowvar=False)
+        # calculate mean and covariance statistics for subset2
+        mu2, sigma2 = subset2.mean(axis=0), np.cov(subset2, rowvar=False)
 
         # calculate sum squared difference between means
         ssdiff = np.sum((mu1 - mu2)**2.0)
 
-        # calculate sqrt of product between cov
+        # calculate sqrt of product between covariances
         covmean = sqrtm(sigma1.dot(sigma2))
 
         # check and correct imaginary numbers from sqrt
         if np.iscomplexobj(covmean):
             covmean = covmean.real
 
-        # calculate the fid score
+        # calculate the FID score
         fid = ssdiff + np.trace(sigma1 + sigma2 - 2.0*covmean)
-        metrics[(var1, var2)] = fid
+        pairwise_fid[(var1, var2)] = fid
 
-    return metrics
+    return pairwise_fid
 
 
+# minimal example of how to extract features for FID
 model = torchvision.models.inception_v3(weights='DEFAULT')
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -250,6 +246,6 @@ batch_list = ["col3", "col4", "col5"]
 
 mean_local_diversity(metadata, batch_list, df_features, k=10)
 silhouette_score(metadata, batch_list, df_features)
-# kullback_leibler_divergence(metadata, batch_list, df_features)  # TODO: fix this
-# jensen_shannon_divergence(metadata, batch_list, df_features)  # TODO: fix this
-# frechet_inception_distance(metadata, batch_list, df_features)  # TODO: fix this
+kullback_leibler_divergence(metadata, batch_list, df_features)
+jensen_shannon_divergence(metadata, batch_list, df_features)
+frechet_inception_distance(metadata, batch_list, df_features)
