@@ -1,7 +1,13 @@
 import pandas as pd
-from imageio import imread
+from imageio.v2 import imread
 from joblib import Parallel, delayed
+import torch
 from tqdm import tqdm
+from PIL import Image
+
+from torchvision.models import resnet18, ResNet18_Weights
+from torchvision import transforms
+import torch.nn as nn
 
 from sklearn.pipeline import Pipeline, FeatureUnion
 
@@ -11,6 +17,9 @@ from sklearn.base import TransformerMixin
 from scipy.stats import kurtosis, skew
 from skimage.feature import graycomatrix, graycoprops
 from skimage.measure import shannon_entropy
+
+from batchdetect.swin_transformer import swin_tiny_patch4_window7_224, ConvStem
+
 
 
 def list_of_dict_to_dict(list_of_dicts):
@@ -106,3 +115,69 @@ class FirstAndSecondLevelFeatures(BaseEstimator, TransformerMixin):
                                                             glcm,
                                                             prop='correlation')[0, 0]
         return features
+
+
+def feature_extraction(metadata, model, transform, device=torch.device("cuda" if torch.cuda.is_available() else "cpu")):
+    file_list = metadata["file"].tolist()
+    features = []
+    for f in tqdm(file_list):
+        image = Image.open(f).convert('RGB')
+
+        with torch.no_grad():
+            with torch.cuda.amp.autocast():
+                image = transform(image).unsqueeze(0)
+                image = image.to(device)
+                features.append(model(image).squeeze().cpu().numpy())
+    
+    return pd.DataFrame(features)
+
+
+def resnet(metadata, device=torch.device("cuda" if torch.cuda.is_available() else "cpu")):
+    # Load pre-trained ResNet model
+    model = nn.Sequential(*list(resnet18(weights=ResNet18_Weights.DEFAULT).children())[:-1])
+    model.to(device)
+    model.eval()
+    
+    # Apply appropriate transformations
+    transform = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+   
+    return feature_extraction(metadata, model, transform, device)
+
+
+def ctranspath(metadata, device=torch.device("cuda" if torch.cuda.is_available() else "cpu")):
+    # Load pre-trained ResNet model
+    feature_extractor = swin_tiny_patch4_window7_224(embed_layer=ConvStem, pretrained=False)
+    feature_extractor.head = nn.Identity()
+
+    ctranspath = torch.load('/home/ubuntu/models/ctranspath.pth')
+    feature_extractor.load_state_dict(ctranspath['model'], strict=True)
+    feature_extractor.to(device)
+    feature_extractor.eval()
+    
+    # Apply appropriate transformations
+    transform = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+    
+    return feature_extraction(metadata, feature_extractor, transform, device)
+
+
+# test the functions above
+# ------------------------
+# from pathlib import Path
+# dataset = 'CRC'
+# base_dir = Path(f'/home/ubuntu/data/BatchDetectData/BatchDetect{dataset}')
+# metadata_path = Path(base_dir / 'metadata.csv')
+# metadata = pd.read_csv(metadata_path)
+
+# first_and_second_order(metadata)
+# resnet(metadata)
+# ctranspath(metadata)
