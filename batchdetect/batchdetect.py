@@ -83,35 +83,15 @@ class BatchDetect():
             # compute pca embedding for self.adata using scanpy
             sc.tl.pca(self.adata)
             sc.pl.pca(self.adata, color=self.metadata.columns.tolist())
-            # plot pca embedding for self.adata using scanpy and group for each obs column in adata
-            # sc.pl.pca(self.adata,)
-            # X_emb = pca_emb(self.features)
         elif method == "tsne":
             # compute tsne embedding for self.adata using scanpy
             sc.tl.tsne(self.adata)
             sc.pl.tsne(self.adata, color=self.metadata.columns.tolist())
-            # X_emb = tsne_emb(self.features)
         elif method == "umap":
             # compute umap embedding for self.adata using scanpy
             sc.pp.neighbors(self.adata)
             sc.tl.umap(self.adata)
             sc.pl.umap(self.adata, color=self.metadata.columns.tolist())
-            # X_emb = umap_emb(self.features)
-
-        # ncols = self.metadata.shape[1]
-        # nrows = 1
-
-        # fig, ax = plt.subplots(nrows=nrows,
-        #                        ncols=ncols,
-        #                        figsize=(5*ncols, 5*nrows),
-        #                        sharex=True, sharey=True)
-        # for j in range(ncols):
-        #     ax[j] = sns.scatterplot(x=X_emb.iloc[:, 0],
-        #                             y=X_emb.iloc[:, 1],
-        #                             s=1,
-        #                             hue=self.metadata.iloc[:, j].tolist(),
-        #                             ax=ax[j])
-        #     ax[j].legend(bbox_to_anchor=(1.04, 1), loc="upper left")
 
     def prince_plot(self, n_components=5):
         """
