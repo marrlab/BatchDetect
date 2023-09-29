@@ -36,18 +36,25 @@ def first_and_second_order(metadata):
                                 ])
     pipeline = Pipeline([("features", feature_union)], verbose=3)
 
-    feature_extractor = FeatureExtractor(pipeline)
+    feature_extractor = FeatureExtractor(pipeline, model)
     list_of_features = feature_extractor.extract_features(metadata)
     df_features = pd.DataFrame(list_of_features)
     return df_features
 
 
 class FeatureExtractor(object):
-    def __init__(self, feature_unions):
+    def __init__(self, feature_unions, model=None):
         self.feature_unions = feature_unions
+        
+        self.model = model
 
     def extract_(self, f):
-        image = imread(f)
+        image = Image.read(f)
+        if self.model is not None:
+            lowres = F.interpolate(image, size=(128, 128))
+            z_content, (mu, _) = model.encoder(lowres)
+            z_random = torch.randn_like(mu) * 2
+            image = self.model.generator(image, z_content, z_random)
         features = self.feature_unions.transform([image]).copy()
         features = list_of_dict_to_dict(features)
         return features
