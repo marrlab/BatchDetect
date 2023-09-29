@@ -55,3 +55,20 @@ The rest would be similar to the previous part.
 ## How to cite this work
 
 coming soon
+
+## Metrics to use:
+
+* Silhoutte Score (UMAP) (Rushin)
+* Mean local diversity (Sophia)
+* Shannon’s equitability (Sophia)
+* Jensen-Shannon distance (Sophia)
+* KL-Divergence (Manuel)
+* other distribution metrics (Ali)
+* Look at scIB (Ali)
+* FID score (Manuel)
+* Moran's I (Rushin)
+…..
+
+Add datasets before Wednesday (21st)
+
+LUNG: 3 Cohorts: TCGA, CPTAC, UCL (cis).

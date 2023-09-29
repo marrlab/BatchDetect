@@ -115,8 +115,9 @@ class BatchDetect():
 
         for i in range(nrows):
             for j in range(ncols):
-                p_value = f_classif(X_emb.iloc[:, i:i+1],
-                                    self.metadata.iloc[:, j])[1][0]
+                mask = self.metadata.iloc[:, j].notnull()  # mask for nan values
+                p_value = f_classif(X_emb.iloc[:, i:i+1][mask],
+                                    self.metadata.iloc[:, j][mask])[1][0]
                 heatmap_mat.iloc[i, j] = p_value
 
         fig, ax = plt.subplots(figsize=(1*ncols, 1*nrows))
@@ -159,11 +160,11 @@ class BatchDetect():
                                        n_repeats=n_repeats)
 
         for col in self.metadata.columns:
-
+            mask = self.metadata.loc[:, col].notnull()
             dc = DummyClassifier(strategy="uniform")
             random_results = cross_val_score(estimator=dc,
-                                             X=self.features,
-                                             y=self.metadata.loc[:, col],
+                                             X=self.features[mask],
+                                             y=self.metadata.loc[:, col][mask],
                                              cv=rskf,
                                              scoring=scorer,
                                              verbose=1)
@@ -174,8 +175,8 @@ class BatchDetect():
 
             rf = RandomForestClassifier(n_jobs=-1)
             rf_results = cross_val_score(estimator=rf,
-                                         X=self.features,
-                                         y=self.metadata.loc[:, col],
+                                         X=self.features[mask],
+                                         y=self.metadata.loc[:, col][mask],
                                          cv=rskf,
                                          scoring=scorer,
                                          verbose=1)
