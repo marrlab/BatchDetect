@@ -128,4 +128,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Visual Studio Code
 .vscode/
+
+# saving location from scanpy
+docs/figures
