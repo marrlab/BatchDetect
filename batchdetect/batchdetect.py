@@ -69,29 +69,31 @@ class BatchDetect():
             self.adata.obs[col] = self.metadata.loc[:, col].tolist()
 
 
-    def low_dim_visualization(self, method="pca"):
+    def low_dim_visualization(self, method="pca", save=None):
         """
         low dimensional visualization creates a 2D representation of the
         provided features and generates scatterplots based on the covariates
         in the metadata
         inputs:
             method (str): one of three options ["pca", "tsne", "umap"]
+            save (str): filename to save the plot
         """
         assert method.lower() in ["pca", "tsne", "umap"]
+        # sc.set_figure_params(figsize=(4, 4))
 
         if method == "pca":
             # compute pca embedding for self.adata using scanpy
             sc.tl.pca(self.adata)
-            sc.pl.pca(self.adata, color=self.metadata.columns.tolist())
+            sc.pl.pca(self.adata, color=self.metadata.columns.tolist(), save=save)
         elif method == "tsne":
             # compute tsne embedding for self.adata using scanpy
             sc.tl.tsne(self.adata)
-            sc.pl.tsne(self.adata, color=self.metadata.columns.tolist())
+            sc.pl.tsne(self.adata, color=self.metadata.columns.tolist(), save=save)
         elif method == "umap":
             # compute umap embedding for self.adata using scanpy
             sc.pp.neighbors(self.adata)
             sc.tl.umap(self.adata)
-            sc.pl.umap(self.adata, color=self.metadata.columns.tolist())
+            sc.pl.umap(self.adata, color=self.metadata.columns.tolist(), save=save)
 
     def prince_plot(self, n_components=5):
         """

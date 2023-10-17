@@ -2,6 +2,7 @@ import pandas as pd
 from imageio.v2 import imread
 from joblib import Parallel, delayed
 import torch
+import torch.nn.functional as F
 from tqdm import tqdm
 from PIL import Image
 
@@ -21,7 +22,6 @@ from skimage.measure import shannon_entropy
 from batchdetect.swin_transformer import swin_tiny_patch4_window7_224, ConvStem
 
 
-
 def list_of_dict_to_dict(list_of_dicts):
     new_dict = dict()
     for one_dict in list_of_dicts:
@@ -36,7 +36,7 @@ def first_and_second_order(metadata):
                                 ])
     pipeline = Pipeline([("features", feature_union)], verbose=3)
 
-    feature_extractor = FeatureExtractor(pipeline, model)
+    feature_extractor = FeatureExtractor(pipeline)
     list_of_features = feature_extractor.extract_features(metadata)
     df_features = pd.DataFrame(list_of_features)
     return df_features
@@ -49,10 +49,10 @@ class FeatureExtractor(object):
         self.model = model
 
     def extract_(self, f):
-        image = Image.read(f)
+        image = imread(f)
         if self.model is not None:
             lowres = F.interpolate(image, size=(128, 128))
-            z_content, (mu, _) = model.encoder(lowres)
+            z_content, (mu, _) = self.model.encoder(lowres)
             z_random = torch.randn_like(mu) * 2
             image = self.model.generator(image, z_content, z_random)
         features = self.feature_unions.transform([image]).copy()
@@ -180,9 +180,11 @@ def ctranspath(metadata, device=torch.device("cuda" if torch.cuda.is_available()
 # test the functions above
 # ------------------------
 # from pathlib import Path
-# dataset = 'CRC'
+# dataset = 'LymphNodes'
+# method = "original"
+# features = "first_and_second_order"
 # base_dir = Path(f'/home/ubuntu/data/BatchDetectData/BatchDetect{dataset}')
-# metadata_path = Path(base_dir / 'metadata.csv')
+# metadata_path = base_dir / f'metadata.csv'
 # metadata = pd.read_csv(metadata_path)
 
 # first_and_second_order(metadata)
