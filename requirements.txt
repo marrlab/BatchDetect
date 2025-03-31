@@ -2,5 +2,12 @@ matplotlib
 numpy
 pandas
 scikit-learn
+scikit-image
 seaborn
 umap-learn
+anndata
+scanpy
+--index-url https://download.pytorch.org/whl/cu126
+torch
+torchvision
+timm
